@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Fake News Detection{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-header fade-in">
+        <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+        <p>Welcome back, {{ current_user.username }}! Analyze news content and view your history.</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Analysis Section -->
+        <div class="dashboard-card analysis-card slide-in-left">
+            <div class="card-header">
+                <h2><i class="fas fa-search"></i> News Analysis</h2>
+            </div>
+
+            <div class="analysis-form">
+                <div class="form-group">
+                    <label for="newsText">Enter News Content:</label>
+                    <textarea
+                        id="newsText"
+                        name="newsText"
+                        placeholder="Paste your news article, headline, or any text content here..."
+                        rows="6"
+                        maxlength="5000"></textarea>
+                    <div class="char-count">
+                        <span id="charCount">0</span>/5000 characters
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="modelSelect">Select Analysis Model:</label>
+                    <select id="modelSelect" name="modelSelect">
+                        <option value="single">Logistic Regression (Recommended)</option>
+                        <option value="multiple">Compare All Models</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button id="analyzeBtn" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Analyze News
+                    </button>
+                    <button id="clearBtn" class="btn btn-secondary">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="results-section" style="display: none;">
+                <div class="results-header">
+                    <h3>Analysis Results</h3>
+                </div>
+
+                <div id="singleResult" class="result-card">
+                    <div class="prediction-result">
+                        <div id="predictionBadge" class="prediction-badge">
+                            <span id="predictionText">Analyzing...</span>
+                        </div>
+                        <div class="confidence-meter">
+                            <div class="confidence-label">Confidence:</div>
+                            <div class="confidence-bar">
+                                <div id="confidenceFill" class="confidence-fill"></div>
+                            </div>
+                            <div id="confidencePercent" class="confidence-percent">0%</div>
+                        </div>
+                    </div>
+
+                    <div class="detailed-results">
+                        <div class="probabilities">
+                            <div class="probability-item">
+                                <span class="label">Real News:</span>
+                                <span id="probReal" class="value">0%</span>
+                            </div>
+                            <div class="probability-item">
+                                <span class="label">Fake News:</span>
+                                <span id="probFake" class="value">0%</span>
+                            </div>
+                        </div>
+                        <div class="model-info">
+                            <span class="label">Model Used:</span>
+                            <span id="modelUsed" class="value">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="multipleResults" class="multiple-results" style="display: none;">
+                    <h4>Model Comparison</h4>
+                    <div id="modelComparison" class="model-comparison">
+                        <!-- Model results will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing content...</p>
+            </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="dashboard-card recent-activity slide-in-right">
+            <div class="card-header">
+                <h2><i class="fas fa-clock"></i> Recent Activity</h2>
+                <a href="{{ url_for('history') }}" class="view-all-link">View All</a>
+            </div>
+
+            <div class="activity-list">
+                {% if predictions %}
+                    {% for prediction in predictions %}
+                    <div class="activity-item">
+                        <div class="activity-content">
+                            <p class="activity-text">{{ prediction.text[:100] }}{% if prediction.text|length > 100 %}...{% endif %}</p>
+                            <div class="activity-meta">
+                                <span class="prediction-label {{ 'real' if prediction.prediction == 'Real News' else 'fake' }}">
+                                    {{ prediction.prediction }}
+                                </span>
+                                <span class="confidence">{{ "%.1f"|format(prediction.confidence * 100) }}%</span>
+                                <span class="timestamp">{{ prediction.created_at.strftime('%b %d, %H:%M') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-activity">
+                        <i class="fas fa-inbox"></i>
+                        <p>No recent activity. Start by analyzing some news content!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Stats Section -->
+        <div class="dashboard-card quick-stats bounce-in">
+            <div class="card-header">
+                <h2><i class="fas fa-chart-bar"></i> Quick Stats</h2>
+                <a href="{{ url_for('stats') }}" class="view-all-link">View Details</a>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">{{ predictions|length }}</div>
+                        <div class="stat-label">Recent Analyses</div>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">
+                            {{ predictions|selectattr('prediction', 'equalto', 'Real News')|list|length }}
+                        </div>
+                        <div class="stat-label">Real News Found</div>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">
+                            {{ predictions|selectattr('prediction', 'equalto', 'Fake News')|list|length }}
+                        </div>
+                        <div class="stat-label">Fake News Detected</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

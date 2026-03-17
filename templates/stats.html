@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics - Fake News Detection{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-header fade-in">
+        <h1><i class="fas fa-chart-bar"></i> Your Statistics</h1>
+        <p>Track your fake news detection activity and performance</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card slide-in-left">
+                <div class="stat-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number">{{ total_predictions }}</div>
+                    <div class="stat-label">Total Analyses</div>
+                </div>
+            </div>
+
+            <div class="stat-card bounce-in">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle" style="color: #00ff88;"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number">{{ real_predictions }}</div>
+                    <div class="stat-label">Real News Detected</div>
+                </div>
+            </div>
+
+            <div class="stat-card slide-in-right">
+                <div class="stat-icon">
+                    <i class="fas fa-exclamation-triangle" style="color: #ff4444;"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number">{{ fake_predictions }}</div>
+                    <div class="stat-label">Fake News Detected</div>
+                </div>
+            </div>
+
+            <div class="stat-card fade-in">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number">{{ recent_predictions }}</div>
+                    <div class="stat-label">Last 30 Days</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="dashboard-grid">
+        <div class="dashboard-card slide-in-left">
+            <div class="card-header">
+                <h2><i class="fas fa-chart-pie"></i> Detection Distribution</h2>
+            </div>
+            <div class="analysis-form">
+                {% if total_predictions > 0 %}
+                    <div class="performance-metrics">
+                        <div class="metric-item">
+                            <div class="metric-label">Real News Percentage</div>
+                            <div class="metric-value">{{ "%.1f"|format((real_predictions / total_predictions) * 100) }}%</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill real" style="width: {{ (real_predictions / total_predictions) * 100 }}%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Fake News Percentage</div>
+                            <div class="metric-value">{{ "%.1f"|format((fake_predictions / total_predictions) * 100) }}%</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill fake" style="width: {{ (fake_predictions / total_predictions) * 100 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="no-data">
+                        <i class="fas fa-chart-bar"></i>
+                        <p>No analysis data yet. Start analyzing news to see your statistics!</p>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Go to Dashboard
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="dashboard-card slide-in-right">
+            <div class="card-header">
+                <h2><i class="fas fa-trophy"></i> Achievements</h2>
+            </div>
+            <div class="analysis-form">
+                <div class="achievements-list">
+                    {% if total_predictions >= 1 %}
+                        <div class="achievement-item unlocked">
+                            <i class="fas fa-star"></i>
+                            <span>First Analysis - Welcome to TrueLens!</span>
+                        </div>
+                    {% else %}
+                        <div class="achievement-item locked">
+                            <i class="fas fa-star"></i>
+                            <span>First Analysis - Start your journey</span>
+                        </div>
+                    {% endif %}
+
+                    {% if total_predictions >= 10 %}
+                        <div class="achievement-item unlocked">
+                            <i class="fas fa-medal"></i>
+                            <span>Analyst - 10 analyses completed</span>
+                        </div>
+                    {% else %}
+                        <div class="achievement-item locked">
+                            <i class="fas fa-medal"></i>
+                            <span>Analyst - {{ 10 - total_predictions }} more to go</span>
+                        </div>
+                    {% endif %}
+
+                    {% if total_predictions >= 50 %}
+                        <div class="achievement-item unlocked">
+                            <i class="fas fa-award"></i>
+                            <span>Expert Detector - 50 analyses completed</span>
+                        </div>
+                    {% else %}
+                        <div class="achievement-item locked">
+                            <i class="fas fa-award"></i>
+                            <span>Expert Detector - {{ 50 - total_predictions }} more to go</span>
+                        </div>
+                    {% endif %}
+
+                    {% if fake_predictions >= 10 %}
+                        <div class="achievement-item unlocked">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Fake News Hunter - Detected 10 fake articles</span>
+                        </div>
+                    {% else %}
+                        <div class="achievement-item locked">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Fake News Hunter - {{ 10 - fake_predictions }} more fake detections</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.performance-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.metric-item {
+    padding: 20px;
+    background: linear-gradient(135deg, var(--card-bg), var(--dark-blue));
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.metric-label {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.metric-bar {
+    width: 100%;
+    height: 12px;
+    background-color: var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.metric-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 1s ease;
+}
+
+.metric-fill.real {
+    background: linear-gradient(90deg, #00ff88, #00d4ff);
+}
+
+.metric-fill.fake {
+    background: linear-gradient(90deg, #ff4444, #ff6b6b);
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+
+.no-data i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.no-data p {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+.achievements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.achievement-item.unlocked {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.1));
+    border-color: var(--primary-color);
+}
+
+.achievement-item.unlocked i {
+    color: var(--primary-color);
+}
+
+.achievement-item.locked {
+    background: var(--card-bg);
+    opacity: 0.6;
+}
+
+.achievement-item.locked i {
+    color: var(--text-muted);
+}
+
+.achievement-item span {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .metric-item {
+        padding: 15px;
+    }
+
+    .metric-value {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .achievement-item {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+}
+</style>
+{% endblock %}

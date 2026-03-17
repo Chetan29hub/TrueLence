@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}Fake News Detection{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TrueLens Logo" class="logo" />
+                <span>TrueLens</span>
+            </div>
+
+            <div class="nav-menu">
+                <a href="{{ url_for('home') }}" class="nav-link">
+                    <i class="fas fa-home"></i> Home
+                </a>
+
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="{{ url_for('history') }}" class="nav-link">
+                        <i class="fas fa-history"></i> History
+                    </a>
+                    <a href="{{ url_for('stats') }}" class="nav-link">
+                        <i class="fas fa-chart-bar"></i> Statistics
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="nav-link logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-link login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-newspaper"></i> Fake News Detector</h3>
+                <p>Advanced AI-powered fake news detection using machine learning algorithms.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                        <li><a href="{{ url_for('history') }}">History</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Technology</h3>
+                <ul>
+                    <li>Machine Learning</li>
+                    <li>Natural Language Processing</li>
+                    <li>TF-IDF Vectorization</li>
+                    <li>Flask Backend</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Fake News Detection System.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

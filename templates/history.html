@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+
+{% block title %}History - Fake News Detection{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-header fade-in">
+        <h1><i class="fas fa-history"></i> Analysis History</h1>
+        <p>View all your previous news analyses and predictions</p>
+    </div>
+
+    <!-- History Table -->
+    <div class="dashboard-card slide-in-left">
+        <div class="card-header">
+            <h2><i class="fas fa-list"></i> All Analyses</h2>
+            <span class="view-all-link">{{ predictions.total }} total</span>
+        </div>
+
+        <div class="analysis-form">
+            {% if predictions.items %}
+                <div class="history-table">
+                    <div class="table-header">
+                        <div class="col-text">Article Text</div>
+                        <div class="col-prediction">Prediction</div>
+                        <div class="col-confidence">Confidence</div>
+                        <div class="col-date">Date</div>
+                        <div class="col-action">Action</div>
+                    </div>
+
+                    {% for prediction in predictions.items %}
+                        <div class="table-row">
+                            <div class="col-text">
+                                <div class="text-preview">
+                                    {{ prediction.text[:150] }}{% if prediction.text|length > 150 %}...{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-prediction">
+                                <span class="prediction-badge {{ 'real' if prediction.prediction == 'Real News' else 'fake' }}">
+                                    {{ prediction.prediction }}
+                                </span>
+                            </div>
+                            <div class="col-confidence">
+                                <div class="confidence-display">
+                                    <span class="confidence-value">{{ "%.1f"|format(prediction.confidence * 100) }}%</span>
+                                    <div class="confidence-mini-bar">
+                                        <div class="confidence-mini-fill {{ 'real' if prediction.prediction == 'Real News' else 'fake' }}" 
+                                             style="width: {{ prediction.confidence * 100 }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-date">
+                                <span class="date-text">{{ prediction.created_at.strftime('%b %d, %Y<br>%H:%M') }}</span>
+                            </div>
+                            <div class="col-action">
+                                <button type="button" class="delete-btn" onclick="deleteHistoryItem({{ prediction.id }})" title="Delete this analysis">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if predictions.pages > 1 %}
+                    <div class="pagination">
+                        {% if predictions.has_prev %}
+                            <a href="{{ url_for('history', page=1) }}" class="pagination-btn">
+                                <i class="fas fa-chevron-left"></i> First
+                            </a>
+                            <a href="{{ url_for('history', page=predictions.prev_num) }}" class="pagination-btn">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </a>
+                        {% endif %}
+
+                        <div class="pagination-info">
+                            Page {{ predictions.page }} of {{ predictions.pages }}
+                        </div>
+
+                        {% if predictions.has_next %}
+                            <a href="{{ url_for('history', page=predictions.next_num) }}" class="pagination-btn">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="{{ url_for('history', page=predictions.pages) }}" class="pagination-btn">
+                                Last <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="no-data">
+                    <i class="fas fa-inbox"></i>
+                    <p>No analysis history yet. Start analyzing news content!</p>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Start Analyzing
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.history-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 20px;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 80px;
+    gap: 15px;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 212, 255, 0.05));
+    border-bottom: 2px solid var(--border-color);
+    border-radius: 12px 12px 0 0;
+    font-weight: 600;
+    color: var(--text-primary);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 80px;
+    gap: 15px;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    transition: all 0.3s ease;
+    align-items: center;
+}
+
+.table-row:hover {
+    background: linear-gradient(135deg, var(--card-bg), var(--dark-blue));
+    box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.1);
+}
+
+.table-row:last-child {
+    border-bottom: none;
+    border-radius: 0 0 12px 12px;
+}
+
+.col-text {
+    font-weight: 500;
+}
+
+.text-preview {
+    color: var(--text-secondary);
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.col-prediction {
+    display: flex;
+    justify-content: center;
+}
+
+.col-confidence {
+    display: flex;
+    justify-content: center;
+}
+
+.confidence-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.confidence-value {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.confidence-mini-bar {
+    width: 100%;
+    height: 6px;
+    background-color: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.confidence-mini-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+}
+
+.confidence-mini-fill.real {
+    background: linear-gradient(90deg, #00ff88, #00d4ff);
+}
+
+.confidence-mini-fill.fake {
+    background: linear-gradient(90deg, #ff4444, #ff6b6b);
+}
+
+.col-date {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.date-text {
+    display: block;
+    line-height: 1.4;
+}
+
+.col-action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-btn {
+    padding: 8px 12px;
+    background-color: rgba(255, 68, 68, 0.2);
+    border: 1px solid #ff4444;
+    color: #ff4444;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.delete-btn:hover {
+    background-color: #ff4444;
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+}
+
+.delete-btn:active {
+    transform: scale(0.95);
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    padding: 10px 15px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pagination-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 212, 255, 0.3);
+}
+
+.pagination-info {
+    padding: 10px 20px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.no-data {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.no-data i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.no-data p {
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 1200px) {
+    .table-header,
+    .table-row {
+        grid-template-columns: 1.5fr 1fr 1fr 1fr 70px;
+    }
+}
+
+@media (max-width: 768px) {
+    .history-table {
+        overflow-x: auto;
+    }
+
+    .table-header,
+    .table-row {
+        grid-template-columns: 150px 100px 100px 120px 60px;
+        gap: 10px;
+        padding: 12px 10px;
+    }
+
+    .col-text {
+        min-width: 150px;
+    }
+
+    .text-preview {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .col-date {
+        font-size: 0.8rem;
+    }
+
+    .date-text {
+        white-space: nowrap;
+        display: inline;
+    }
+
+    .pagination {
+        gap: 5px;
+    }
+
+    .pagination-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .table-header,
+    .table-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .table-header {
+        display: none;
+    }
+
+    .table-row {
+        padding: 15px;
+        background: linear-gradient(135deg, var(--dark-blue), var(--card-bg));
+        border-radius: 12px;
+        margin-bottom: 15px;
+    }
+
+    .col-text::before {
+        content: "Article: ";
+        display: block;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 5px;
+    }
+
+    .col-prediction::before {
+        content: "Status: ";
+        display: block;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .col-confidence::before {
+        content: "Confidence: ";
+        display: block;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .col-date::before {
+        content: "Date: ";
+        display: block;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .confidence-display {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .confidence-mini-bar {
+        flex: 1;
+        margin-left: 10px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function deleteHistoryItem(predictionId) {
+    if (confirm('Are you sure you want to delete this analysis? This action cannot be undone.')) {
+        fetch(`/delete-history/${predictionId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Analysis deleted successfully!');
+                location.reload();
+            } else {
+                alert('Failed to delete analysis: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the analysis.');
+        });
+    }
+}
+
+// Add event listeners to all delete buttons
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const predictionId = this.getAttribute('data-id');
+            if (predictionId) {
+                deleteHistoryItem(parseInt(predictionId));
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

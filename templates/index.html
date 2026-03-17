@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Fake News Detection{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content fade-in">
+        <h1><i class="fas fa-shield-alt"></i> Detect Fake News with AI</h1>
+        <p>Advanced machine learning algorithms analyze news content to determine authenticity with high accuracy.</p>
+
+        {% if not current_user.is_authenticated %}
+            <div class="hero-buttons">
+                <a href="{{ url_for('register') }}" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Get Started
+                </a>
+                <a href="{{ url_for('login') }}" class="btn btn-secondary">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </div>
+        {% else %}
+            <div class="hero-buttons">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                    <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    <div class="hero-image">
+        <i class="fas fa-newspaper"></i>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <h2>Why Choose Our System?</h2>
+        <div class="features-grid">
+            <div class="feature-card slide-in-left">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Advanced AI</h3>
+                <p>Powered by multiple machine learning algorithms including Logistic Regression, Naive Bayes, and SVM.</p>
+            </div>
+
+            <div class="feature-card fade-in">
+                <div class="feature-icon">
+                    <i class="fas fa-language"></i>
+                </div>
+                <h3>NLP Processing</h3>
+                <p>Advanced text preprocessing with tokenization, lemmatization, and stopword removal.</p>
+            </div>
+
+            <div class="feature-card slide-in-right">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>High Accuracy</h3>
+                <p>Achieves 85-95% accuracy in detecting fake news with confidence scoring.</p>
+            </div>
+
+            <div class="feature-card bounce-in">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Secure & Private</h3>
+                <p>User authentication and secure data handling with encrypted storage.</p>
+            </div>
+
+            <div class="feature-card slide-in-left">
+                <div class="feature-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3>Analysis History</h3>
+                <p>Keep track of all your analyses with detailed history and statistics.</p>
+            </div>
+
+            <div class="feature-card slide-in-right">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Responsive Design</h3>
+                <p>Works perfectly on desktop, tablet, and mobile devices.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="demo-section">
+    <div class="container">
+        <h2>Try It Now</h2>
+        <p>Experience our fake news detection in action with sample content.</p>
+
+        <div class="demo-examples">
+            <div class="demo-card">
+                <h4>Real News Example:</h4>
+                <p class="demo-text">"NASA's James Webb Space Telescope discovers water vapor on distant exoplanet. The telescope detected water signatures in the atmosphere of K2-18 b, a planet 120 light-years from Earth."</p>
+                <span class="demo-label real">Real News</span>
+            </div>
+
+            <div class="demo-card">
+                <h4>Fake News Example:</h4>
+                <p class="demo-text">"BREAKING: Aliens land in New York City! Extraterrestrial spacecraft spotted hovering over Manhattan as world leaders prepare for first contact."</p>
+                <span class="demo-label fake">Fake News</span>
+            </div>
+        </div>
+
+        {% if not current_user.is_authenticated %}
+            <div class="cta-section">
+                <p>Ready to analyze your own content?</p>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i> Create Account
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="stats-section">
+    <div class="container">
+        <h2>System Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">95%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3</div>
+                <div class="stat-label">ML Models</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5000+</div>
+                <div class="stat-label">Features</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Available</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
