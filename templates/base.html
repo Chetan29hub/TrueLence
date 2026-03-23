@@ -14,8 +14,9 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TrueLens Logo" class="logo" />
-                <span>TrueLens</span>
+                <a href="{{ url_for('home') }}" style="display: flex; align-items: center; height: 100%;">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo" />
+                </a>
             </div>
 
             <div class="nav-menu">
