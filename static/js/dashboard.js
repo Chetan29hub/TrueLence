@@ -92,6 +92,8 @@ function analyzeText(text, modelType) {
             throw new Error(data.error);
         }
 
+        hideSpinner();
+
         if (modelType === 'multiple') {
             displayMultipleResults(data);
         } else {
@@ -102,12 +104,12 @@ function analyzeText(text, modelType) {
         showAlert('Analysis completed successfully!', 'success');
     })
     .catch(error => {
+        hideSpinner();
         console.error('Analysis error:', error);
         showAlert(error.message || 'Analysis failed. Please try again.', 'error');
     })
     .finally(() => {
         hideLoading(analyzeBtn, '<i class="fas fa-search"></i> Analyze News');
-        hideSpinner();
     });
 }
 
@@ -199,6 +201,13 @@ function displayMultipleResults(data) {
 function showResults() {
     const resultsSection = document.getElementById('resultsSection');
     resultsSection.style.display = 'block';
+    
+    // Add cool animation
+    resultsSection.classList.remove('bounce-in');
+    resultsSection.classList.remove('fade-in');
+    void resultsSection.offsetWidth; // trigger reflow
+    resultsSection.classList.add('bounce-in');
+    
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -229,8 +238,11 @@ function showAlert(message, type = 'info') {
         ${message}
     `;
 
-    const container = document.querySelector('.dashboard-grid');
-    if (container) {
+    const dashboardGrid = document.querySelector('.dashboard-grid');
+    if (dashboardGrid && dashboardGrid.parentNode) {
+        dashboardGrid.parentNode.insertBefore(alertDiv, dashboardGrid);
+    } else {
+        const container = document.querySelector('.container') || document.body;
         container.insertBefore(alertDiv, container.firstChild);
     }
 

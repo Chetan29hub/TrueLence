@@ -774,6 +774,43 @@ textarea:focus {
     color: var(--text-primary);
 }
 
+.form-group select {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    background-color: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: var(--transition);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300d4ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+    cursor: pointer;
+}
+
+.form-group select:hover {
+    border-color: rgba(0, 212, 255, 0.5);
+}
+
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+}
+
+.form-group select option {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    padding: 10px;
+    font-size: 1rem;
+}
+
 /* Results Section */
 .results-section {
     padding: 30px;
@@ -1037,6 +1074,31 @@ textarea:focus {
 @keyframes glowPulse {
     0% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
     100% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.6), 0 0 40px rgba(0, 212, 255, 0.3); }
+}
+
+.floating {
+    animation: floating 4s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+    100% { transform: translateY(0) rotate(0); }
+}
+
+.scale-in-up {
+    animation: scaleInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1) both;
+}
+
+@keyframes scaleInUp {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(50px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 /* Activity List */

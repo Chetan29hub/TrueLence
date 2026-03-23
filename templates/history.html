@@ -411,10 +411,12 @@
 <script>
 function deleteHistoryItem(predictionId) {
     if (confirm('Are you sure you want to delete this analysis? This action cannot be undone.')) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         fetch(`/delete-history/${predictionId}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
             }
         })
         .then(response => response.json())
